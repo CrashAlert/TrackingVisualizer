@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import _ from 'lodash'
 
 const baseUrl = "/map/"
 
@@ -17,11 +18,11 @@ function initMap() {
     center: {lat: -180, lng: -180},
   })
 
-  // handleWaypoints(waypoints)
+  // handleData(waypoints)
 
   fetchDataPoints()
     .then(response => response.json())
-    .then(handleWaypoints)
+    .then(handleData)
 }
 
 window.initMap = initMap
@@ -40,10 +41,29 @@ function fetchDataPoints() {
   return fetch(url)
 }
 
-function handleWaypoints(waypoints) {
+function maxError(elem) {
+  return _.max([elem.err_lat, elem.err_lng])
+}
+
+function handleData(rawData) {
+  let data
+  if (getParameterByName('filterData') != '') {
+    let filterVal = parseInt(getParameterByName('filterData'))
+    data = _.filter(rawData, elem => {
+      return maxError(elem) < filterVal
+    })
+  } else {
+    data = rawData
+  }
+
+  let waypoints = _.map(data, (elem) => _.pick(elem, ['lat', 'lng']))
+
   addLines(waypoints)
   addMarkers(waypoints)
   fitWaypoints(waypoints)
+  if (getParameterByName('showErrors') == '1') {
+    addErrors(data)
+  }
 }
 
 function fitWaypoints(waypoints) {
@@ -53,6 +73,23 @@ function fitWaypoints(waypoints) {
     }, new google.maps.LatLngBounds())
   map.setCenter(bounds.getCenter())
   map.fitBounds(bounds)
+}
+
+function addErrors(data) {
+  _.forEach(data, elem => {
+    let location = _.pick(elem, ['lat', 'lng'])
+    let error = maxError(elem)
+    new google.maps.Circle({
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.1,
+      map: map,
+      center: location,
+      radius: error
+    })
+  })
 }
 
 function addMarkers(waypoints) {
