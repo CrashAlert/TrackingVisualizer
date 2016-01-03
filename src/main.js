@@ -1,23 +1,19 @@
 import express from 'express'
-import index from './index'
-import page from './page'
 import { readStore, readCSV } from './csv-store'
 import { mapTransform } from './map-transform'
-import Promis from 'bluebird'
 
-// Configure Error Handling
-// Promise.onPossiblyUnhandledRejection(function(error){
-//     throw error
-// })
 
+// Load app
 var app = express();
-app.get('/', index);
 
+// Store API
 app.get('/store/:file', readCSV)
 app.get('/store', readStore)
+
+// Map API
 app.get('/map/:file', mapTransform)
 
-app.get('/page', page)
 
+// Start Server
 console.log('Listening on port 4000...')
 app.listen(4000)
