@@ -6,7 +6,7 @@ import _ from 'lodash'
 
 // Read CSV File and transform coordinates
 
-const mapColumns = ['lat', 'lng']
+const mapColumns = ['lat', 'lng', 'err_lat', 'err_lng']
 const parseConfig = {
   header: true,
   skipEmptyLines: true
