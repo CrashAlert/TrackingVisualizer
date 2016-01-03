@@ -1,14 +1,22 @@
-import express from 'express';
-import index from './index';
-import page from './page';
+import express from 'express'
 import path from 'path'
+import { readStore, readCSV } from './csv-store'
+import { mapTransform } from './map-transform'
 
+
+// Load app
 var app = express();
 
 app.use('/', express.static(path.resolve(__dirname, '..', 'static')))
 
-app.get('/', index);
-app.get('/page', page);
+// Store API
+app.get('/store/:file', readCSV)
+app.get('/store', readStore)
 
-console.log("Listening on port 4000...");
-app.listen(4000);
+// Map API
+app.get('/map/:file', mapTransform)
+
+
+// Start Server
+console.log('Listening on port 4000...')
+app.listen(4000)
