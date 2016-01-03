@@ -1,8 +1,12 @@
 import express from 'express';
 import index from './index';
 import page from './page';
+import path from 'path'
 
 var app = express();
+
+app.use('/', express.static(path.resolve(__dirname, '..', 'static')))
+
 app.get('/', index);
 app.get('/page', page);
 

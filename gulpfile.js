@@ -34,7 +34,7 @@ function config(overrides) {
 // frontend
 
 var frontendConfig = config({
-  entry: './static/js/main.js',
+  entry: ['./static/js/main.js', './static/js/map.js'],
   output: {
     path: path.join(__dirname, 'static/build'),
     filename: 'frontend.js'
