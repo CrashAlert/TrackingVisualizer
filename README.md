@@ -1,7 +1,7 @@
 # TrackingVisualizer
 Store tracking data in REST backend and show a map view for each listed tracking
 
-
+<img src="http://i.imgur.com/ESdYTW8.jpg" alt="Screenshot" width="600">
 
 ## Installation
 
