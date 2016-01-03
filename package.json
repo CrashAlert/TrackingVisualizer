@@ -1,0 +1,19 @@
+{
+  "name": "tracking-visualizer",
+  "version": "1.0.0",
+  "description": "Store tracking data in REST backend and show a map view for each listed tracking",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CrashAlert/TrackingVisualizer.git"
+  },
+  "author": "HelperNet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CrashAlert/TrackingVisualizer/issues"
+  },
+  "homepage": "https://github.com/CrashAlert/TrackingVisualizer#readme"
+}
