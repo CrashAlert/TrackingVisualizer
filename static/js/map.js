@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch'
 
-const baseUrl = "/maps/"
+const baseUrl = "/map/"
 
 var map;
 
@@ -17,7 +17,7 @@ function initMap() {
     center: {lat: -180, lng: -180},
   })
 
-  handleWaypoints(waypoints)
+  // handleWaypoints(waypoints)
 
   fetchDataPoints()
     .then(response => response.json())
@@ -36,7 +36,7 @@ function getParameterByName(name) {
 }
 
 function fetchDataPoints() {
-  const url = baseUrl + getParameterByName()
+  const url = baseUrl + getParameterByName("fileName")
   return fetch(url)
 }
 
@@ -61,8 +61,8 @@ function addMarkers(waypoints) {
     fillColor: "CC0000",
     strokeColor: "CC0000",
     path: google.maps.SymbolPath.CIRCLE,
-    scale: 6,
-    strokeWeight: 2
+    scale: 3,
+    strokeWeight: 1
   }
 
   for (let waypoint of waypoints) {
