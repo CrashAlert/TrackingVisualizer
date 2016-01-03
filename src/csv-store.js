@@ -1,19 +1,29 @@
 import fs from 'fs'
 import path from 'path'
 import Promise from 'bluebird'
-import { map } from 'transducers.js'
+import { map, filter } from 'transducers.js'
 
 
 // Store Management
 
 const storeDir = path.resolve(__dirname, '..', 'data')
-
+const EXTENSIONS = ['csv']
 
 function trimExtensions(filenames) {
   return map(filenames, (name) => {
     return name.split('.')[0]
   })
 }
+
+function whiteListExtensions(files, extensions) {
+  return filter(files, (file) => {
+    const splits = file.split('.')
+    const extension = splits[splits.length - 1]
+
+    return extensions.indexOf(extension) !== -1
+  })
+}
+
 
 
 function readFiles() {
@@ -23,7 +33,8 @@ function readFiles() {
         reject(err)
       }
 
-      resolve(trimExtensions(files))
+      const allowedFiles = whiteListExtensions(files, EXTENSIONS)
+      resolve(trimExtensions(allowedFiles))
     })
   })
 }
@@ -43,9 +54,6 @@ export function readFile(file) {
 }
 
 
-
-
-
 // API
 
 export function readStore(req, res, next) {
@@ -53,6 +61,7 @@ export function readStore(req, res, next) {
     .then((files) => res.send(files))
     .catch((err) => next(err))
 }
+
 
 /*
  * Requires file param
