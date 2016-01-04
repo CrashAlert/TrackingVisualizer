@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import Promise from 'bluebird'
 import { map, filter } from 'transducers.js'
+import Papa from 'papaparse'
 
 
 // Store Management
@@ -23,8 +24,6 @@ function whiteListExtensions(files, extensions) {
     return extensions.indexOf(extension) !== -1
   })
 }
-
-
 
 function readFiles() {
   return new Promise((resolve, reject)  => {
@@ -53,8 +52,36 @@ export function readFile(file) {
   })
 }
 
+function validateCSV(csvstring) {
+  const parseConfig = {
+    header: true,
+    skipEmptyLines: true
+  }
 
+  const result = Papa.parse(csvstring, parseConfig)
+  return result.errors.length == 0
+}
+
+function writeFile(filename, file) {
+  return new Promise((resolve, reject) => {
+    const name = path.join(storeDir, filename + '.csv')
+    console.log(name)
+
+
+    fs.writeFile(name, file, { encoding: 'utf8' }, (err) => {
+      if (err) {
+        reject(err)
+      }
+
+      resolve(filename)
+    })
+  })
+}
+
+
+//
 // API
+//
 
 export function readStore(req, res, next) {
   readFiles()
@@ -62,6 +89,22 @@ export function readStore(req, res, next) {
     .catch((err) => next(err))
 }
 
+/*
+ * Requires a text/* content type and a valid body-parser
+ */
+export function storeCSV(req, res, next) {
+  if (!req.body || Object.keys(req.body).length == 0) {
+    throw new Error('Upload data is not available')
+  }
+
+
+  if (!validateCSV(req.body)) {
+    throw new Error('Invalid CSV posted')
+  }
+
+  writeFile(req.params.file, req.body)
+    .then(() => res.end())
+}
 
 /*
  * Requires file param
