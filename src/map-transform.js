@@ -6,7 +6,7 @@ import _ from 'lodash'
 
 // Read CSV File and transform coordinates
 
-const mapColumns = ['lat', 'lng', 'err_lat', 'err_lng']
+const mapColumns = ['lat', 'lng', 'err_lat', 'err_lng', 'bearing']
 const parseConfig = {
   header: true,
   skipEmptyLines: true
@@ -29,7 +29,6 @@ function getColumns(csv, columns) {
   return map(csv, (row) => {
     return filter(row, (column) => {
       const header = column[0]
-
       return columns.indexOf(header) !== -1
     })
   })

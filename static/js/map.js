@@ -45,6 +45,10 @@ function maxError(elem) {
   return _.max([elem.err_lat, elem.err_lng])
 }
 
+function getColumns(data, columnNames) {
+  return _.map(data, (elem) => _.pick(elem, columnNames))
+}
+
 function handleData(rawData) {
   let data
   if (getParameterByName('filterData') != '') {
@@ -56,10 +60,12 @@ function handleData(rawData) {
     data = rawData
   }
 
-  let waypoints = _.map(data, (elem) => _.pick(elem, ['lat', 'lng']))
+  const waypoints = getColumns(data, ['lat', 'lng'])
+  const bearings = getColumns(data, ['bearing'])
 
   addLines(waypoints)
   addMarkers(waypoints)
+  addBearings(waypoints, bearings)
   fitWaypoints(waypoints)
   if (getParameterByName('showErrors') == '1') {
     addErrors(data)
@@ -93,7 +99,6 @@ function addErrors(data) {
 }
 
 function addMarkers(waypoints) {
-
   const circle = {
     fillColor: "CC0000",
     strokeColor: "CC0000",
@@ -120,4 +125,38 @@ function addLines(waypoints) {
   })
 
   path.setMap(map)
+}
+
+function getBearingPoint(point, bearing) {
+  const dist = google.maps.geometry.spherical.computeDistanceBetween
+  const length = 10
+
+  const latConv = dist(point, new google.maps.LatLng(point.lat() + 0.1, point.lng())) * 10
+  const lngConv = dist(point, new google.maps.LatLng(point.lat(), point.lng() + 0.1)) * 10
+  const lat = length * Math.cos(bearing * Math.PI / 180) / latConv
+  const lng = length * Math.sin(bearing * Math.PI / 180) / lngConv
+  return new google.maps.LatLng(point.lat() + lat, point.lng() + lng)
+}
+
+function addBearings(waypoints, bearings) {
+  const arrowSymbol = {
+    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+    fillColor: "CC0000",
+    strokeColor: "CC0000",
+    strokeWeight: 2
+  }
+
+  for (let i in waypoints) {
+    const point = new google.maps.LatLng(waypoints[i].lat, waypoints[i].lng)
+    const bearing = bearings[i].bearing
+    const bearingPoint = getBearingPoint(point, bearing)
+
+    new google.maps.Polyline({
+      path: [point, bearingPoint],
+      icons: [{
+        icon: arrowSymbol
+      }],
+      map: map
+    })
+  }
 }
